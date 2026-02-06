@@ -9,5 +9,5 @@
  * @returns The text converted to uppercase.
  */
 export function transformToUppercase(text: string): string {
-  return "text.toUpperCase()";
+  return text.toUpperCase();
 }
