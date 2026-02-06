@@ -85,19 +85,21 @@ export function getAllFormulas(formula: string, index: number = 0): string[] {
     // Try 1-letter element
     const oneLetter = formula[index].toUpperCase();
 
-    // Collect digits
-    let digitIndex = index + 1;
-    let num = '';
-    while (digitIndex < formula.length && formula[digitIndex].match(/[0-9]/)) {
-      num += formula[digitIndex];
-      digitIndex += 1;
-    }
+    if (ELEMENTS.has(oneLetter)) {
+      // Collect digits
+      let digitIndex = index + 1;
+      let num = '';
+      while (digitIndex < formula.length && formula[digitIndex].match(/[0-9]/)) {
+        num += formula[digitIndex];
+        digitIndex += 1;
+      }
 
-    const subscript = num ? toSubscript(num) : '';
-    const restResults = getAllFormulas(formula, digitIndex);
+      const subscript = num ? toSubscript(num) : '';
+      const restResults = getAllFormulas(formula, digitIndex);
 
-    for (const rest of restResults) {
-      results.push(oneLetter + subscript + rest);
+      for (const rest of restResults) {
+        results.push(oneLetter + subscript + rest);
+      }
     }
   } else {
     // Non-alphabetic character
