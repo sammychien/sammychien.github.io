@@ -1,4 +1,4 @@
-import { transformToUppercase } from './clipboard_util';
+import { formatFormula } from './clipboard_util';
 import './style.css';
 
 const textInput = document.getElementById('textInput') as HTMLInputElement;
@@ -17,8 +17,8 @@ textInput.addEventListener('keypress', async (e: KeyboardEvent) => {
       return;
     }
 
-    // Use the utility function to transform to uppercase
-    text = transformToUppercase(text);
+    // Use the utility function to format chemical formulas with subscripts
+    text = formatFormula(text);
 
     try {
       await navigator.clipboard.writeText(text);
