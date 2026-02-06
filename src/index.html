@@ -17,7 +17,18 @@
         autofocus
       />
       <div class="feedback" id="feedback"></div>
+      <div id="history"></div>
     </div>
+
+    <div id="disambiguationModal" class="modal">
+      <div class="modal-content">
+        <h2>Multiple Interpretations Found</h2>
+        <p>Press the number (1-9) of your choice:</p>
+        <div id="disambiguationOptions"></div>
+        <p class="modal-hint">Press Escape to cancel</p>
+      </div>
+    </div>
+
     <script type="module" src="/main.ts"></script>
   </body>
 </html>

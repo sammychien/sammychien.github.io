@@ -43,58 +43,72 @@ function toSubscript(numStr: string): string {
 }
 
 /**
- * Format a chemical formula by capitalizing elements and converting numbers to subscripts.
+ * Get all possible chemical formula interpretations.
+ * Handles ambiguous formulas by exploring all valid parsing paths.
  * 
- * @param formula - The chemical formula to format.
- * @returns The formatted formula with subscripts.
+ * @param formula - The chemical formula to parse.
+ * @param index - Current position in the formula (for recursion).
+ * @returns Array of all possible formatted formulas.
  */
-export function formatFormula(formula: string): string {
-  const result: string[] = [];
-  let i = 0;
+export function getAllFormulas(formula: string, index: number = 0): string[] {
+  if (index >= formula.length) {
+    return [''];
+  }
 
-  while (i < formula.length) {
-    if (formula[i].match(/[a-zA-Z]/)) {
-      // Try to match two-letter element
-      let elem: string;
-      if (i + 1 < formula.length && formula[i + 1].match(/[a-zA-Z]/)) {
-        const twoLetter = formula.substring(i, i + 2);
-        const capitalized =
-          twoLetter.charAt(0).toUpperCase() + twoLetter.charAt(1).toLowerCase();
+  const results: string[] = [];
 
-        if (ELEMENTS.has(capitalized)) {
-          elem = capitalized;
-          i += 2;
-        } else {
-          // Try single letter
-          elem = formula[i].toUpperCase();
-          i += 1;
+  if (formula[index].match(/[a-zA-Z]/)) {
+    // Try 2-letter element first
+    if (index + 1 < formula.length && formula[index + 1].match(/[a-zA-Z]/)) {
+      const twoLetter = formula.substring(index, index + 2);
+      const capitalized =
+        twoLetter.charAt(0).toUpperCase() + twoLetter.charAt(1).toLowerCase();
+
+      if (ELEMENTS.has(capitalized)) {
+        // Collect digits
+        let digitIndex = index + 2;
+        let num = '';
+        while (digitIndex < formula.length && formula[digitIndex].match(/[0-9]/)) {
+          num += formula[digitIndex];
+          digitIndex += 1;
         }
-      } else {
-        // Single letter element
-        elem = formula[i].toUpperCase();
-        i += 1;
-      }
 
-      result.push(elem);
+        const subscript = num ? toSubscript(num) : '';
+        const restResults = getAllFormulas(formula, digitIndex);
 
-      // Collect following digits
-      let num = '';
-      while (i < formula.length && formula[i].match(/[0-9]/)) {
-        num += formula[i];
-        i += 1;
+        for (const rest of restResults) {
+          results.push(capitalized + subscript + rest);
+        }
       }
+    }
 
-      if (num) {
-        result.push(toSubscript(num));
-      }
-    } else {
-      // Non-alphabetic character
-      result.push(formula[i]);
-      i += 1;
+    // Try 1-letter element
+    const oneLetter = formula[index].toUpperCase();
+
+    // Collect digits
+    let digitIndex = index + 1;
+    let num = '';
+    while (digitIndex < formula.length && formula[digitIndex].match(/[0-9]/)) {
+      num += formula[digitIndex];
+      digitIndex += 1;
+    }
+
+    const subscript = num ? toSubscript(num) : '';
+    const restResults = getAllFormulas(formula, digitIndex);
+
+    for (const rest of restResults) {
+      results.push(oneLetter + subscript + rest);
+    }
+  } else {
+    // Non-alphabetic character
+    const restResults = getAllFormulas(formula, index + 1);
+
+    for (const rest of restResults) {
+      results.push(formula[index] + rest);
     }
   }
 
-  return result.join('');
+  return results;
 }
 
 /**
